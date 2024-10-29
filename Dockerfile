@@ -48,7 +48,7 @@ COPY conf/hbase-site.xml /hbase/conf/
 COPY config-hbase.sh /build/
 COPY profile.d/java.sh /etc/profile.d/
 
-RUN chmod +x /entrypoint.sh && chmod +x /build/config-hbase.sh && /etc/profile.d/java.sh
+RUN chmod +x /entrypoint.sh && chmod +x /build/config-hbase.sh && chmod +x /etc/profile.d/java.sh
 
 RUN /build/config-hbase.sh
 
