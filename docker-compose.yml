@@ -37,6 +37,7 @@ services:
   hbase-master:
     hostname: hbase-master
     container_name: hbase-master
+    domainname: hbase-network
     depends_on:
       - zookeeper
       - datanode
@@ -61,6 +62,7 @@ services:
   hbase-regionserver:
     hostname: hbase-regionserver
     container_name: hbase-regionserver
+    domainname: hbase-network
     depends_on:
       - hbase-master
       - datanode
