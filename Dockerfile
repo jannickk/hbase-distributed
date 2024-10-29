@@ -15,7 +15,7 @@ LABEL org.opencontainers.image.description="HBase" \
 
 ENV PATH $PATH:/hbase/bin
 
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
 ENV LD_LIBRARY_PATH=/hadoop/lib/native
 ENV HBASE_LIBRARY_PATH=/hadoop/lib/native
@@ -29,7 +29,7 @@ ENV HBASE_HOME=/hbase
 
 WORKDIR /
 
-RUN apt-get update && apt-get install wget tar netcat openjdk-11-jdk libsnappy-java libsnappy-dev -y && \
+RUN apt-get update && apt-get install wget tar netcat openjdk-17-jdk libsnappy-java libsnappy-dev -y && \
     wget -t 10 --max-redirect 1 --retry-connrefused -O "hbase-$HBASE_VERSION-bin.tar.gz" "$DOWNLOAD_URL" && \
     mkdir "hbase-$HBASE_VERSION" && \
     mkdir "hadoop" && \
