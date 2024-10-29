@@ -35,6 +35,7 @@ services:
       restart_policy:
         condition: on-failure
   hbase-master:
+    hostname: hbase-master
     depends_on:
       - zookeeper
       - datanode
@@ -57,6 +58,7 @@ services:
         reservations:
           memory: 500M
   hbase-regionserver:
+    hostname: hbase-regionserver
     depends_on:
       - hbase-master
       - datanode
@@ -96,7 +98,7 @@ services:
 volumes:
   datanode:
   namenode:
-  
+
 networks:
   default:
     name: hbase-network

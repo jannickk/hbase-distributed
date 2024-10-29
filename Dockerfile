@@ -45,6 +45,7 @@ RUN apt-get update && apt-get install wget tar netcat openjdk-11-jdk libsnappy-j
 
 COPY entrypoint.sh /
 COPY conf/hbase-site.xml /hbase/conf/
+COPY conf/regionservers /hbase/conf/
 COPY config-hbase.sh /build/
 COPY profile.d/java.sh /etc/profile.d/
 
