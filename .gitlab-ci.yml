@@ -1,0 +1,15 @@
+
+
+variables:
+  HBASE_VERSION: 2.6.1
+
+build_hbase_docker_images:
+  stage: build_docker_images
+  rules:
+    - if: '$CI_COMMIT_TAG == null' # run this job only when a commit to branch happened and no tag was set
+  tags:
+    - maven-ubuntu
+  script:
+    - chmod +x $CI_PROJECT_DIR/*.sh
+    - chmod +x $CI_PROJECT_DIR/hadoop.env
+    - docker build --build-arg HBASE_VERSION=$HBASE_VERSION -t hbase-distributed:$HBASE_VERSION .
