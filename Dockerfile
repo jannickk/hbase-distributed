@@ -46,8 +46,12 @@ RUN apt-get update && apt-get install wget tar netcat openjdk-11-jdk libsnappy-j
 COPY entrypoint.sh /
 COPY conf/hbase-site.xml /hbase/conf/
 COPY config-hbase.sh /build/
-RUN /build/config-hbase.sh
 COPY profile.d/java.sh /etc/profile.d/
+
+RUN chmod +x /entrypoint.sh && chmod +x /build/config-hbase.sh && /etc/profile.d/java.sh
+
+RUN /build/config-hbase.sh
+
 
 # Stargate  8080  / 8085
 # Thrift    9090  / 9095
