@@ -22,7 +22,6 @@ services:
     ports:
       - 9870:9870
       - 9000:9000
-
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
     volumes:
@@ -35,52 +34,12 @@ services:
       mode: global
       restart_policy:
         condition: on-failure
-
-  resourcemanager:
-    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.2.1-java8
-    environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
-    env_file:
-      - ./hadoop.env
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-    healthcheck:
-      disable: true
-
-  nodemanager:
-    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.2.1-java8
-    environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
-    env_file:
-      - ./hadoop.env
-    deploy:
-      mode: global
-      restart_policy:
-        condition: on-failure
-
-  historyserver:
-    image: bde2020/hadoop-historyserver:2.0.0-hadoop3.2.1-java8
-    volumes:
-      - hadoop_historyserver:/hadoop/yarn/timeline
-    environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
-    env_file:
-      - ./hadoop.env
-    deploy:
-      mode: replicated
-      replicas: 1
-
   hbase-master:
     depends_on:
       - zookeeper
       - datanode
       - namenode
-      - resourcemanager
-      - nodemanager
-    image: hbase-cluster-docker:2.1.3
+    image: hbase-distributed:2.6.1
     environment:
       SERVICE_PRECONDITION: "namenode:9000 datanode:9864"
     command: master
@@ -97,16 +56,13 @@ services:
           memory: 1G
         reservations:
           memory: 500M
-
   hbase-regionserver:
     depends_on:
       - hbase-master
       - datanode
       - namenode
       - zookeeper
-      - resourcemanager
-      - nodemanager
-    image: hbase-cluster-docker:2.1.3
+    image: hbase-distributed:2.6.1
     environment:
       SERVICE_PRECONDITION: "hbase-master:16010"
     command: regionserver
@@ -126,7 +82,7 @@ services:
   hbase-stargate:
     depends_on:
       - hbase-master
-    image: hbase-cluster-docker:2.1.3
+    image: hbase-distributed:2.6.1
     command: stargate
     ports:
       - 8080:8080
@@ -140,8 +96,7 @@ services:
 volumes:
   datanode:
   namenode:
-  hadoop_historyserver:
-
+  
 networks:
   default:
     name: hbase-network
