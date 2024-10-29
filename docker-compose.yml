@@ -36,6 +36,7 @@ services:
         condition: on-failure
   hbase-master:
     hostname: hbase-master
+    container_name: hbase-master
     depends_on:
       - zookeeper
       - datanode
@@ -59,6 +60,7 @@ services:
           memory: 500M
   hbase-regionserver:
     hostname: hbase-regionserver
+    container_name: hbase-regionserver
     depends_on:
       - hbase-master
       - datanode
