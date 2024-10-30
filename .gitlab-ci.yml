@@ -12,5 +12,5 @@ build_hbase_docker_images:
     - docker-build
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg HBASE_VERSION=$HBASE_VERSION -t hbase-distributed:$HBASE_VERSION .
+    - docker build --build-arg HBASE_VERSION=$HBASE_VERSION -t registry.gitlab.com/massflows/devops/hbase-distributed/hbase-distributed:$HBASE_VERSION .
     - docker push $CI_REGISTRY/massflows/devops/hbase-distributed/hbase-distributed:$HBASE_VERSION
