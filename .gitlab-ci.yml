@@ -1,16 +1,31 @@
 
 
+
+
 stages:
   - build_docker_images
 
 variables:
   HBASE_VERSION: 2.6.1
 
-build_hbase_docker_images:
+build_hbase_distributed_docker_image:
   stage: build_docker_images
   tags:
     - docker-build
   script:
+    - cd hbase-distributed
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg HBASE_VERSION=$HBASE_VERSION -t registry.gitlab.com/massflows/devops/hbase-distributed/hbase-distributed:$HBASE_VERSION .
-    - docker push $CI_REGISTRY/massflows/devops/hbase-distributed/hbase-distributed:$HBASE_VERSION
+    - docker build --build-arg HBASE_VERSION=$HBASE_VERSION -t registry.gitlab.com/massflows/devops/hbase/hbase-distributed:$HBASE_VERSION .
+    - docker push $CI_REGISTRY/massflows/devops/hbase/hbase-distributed:$HBASE_VERSION
+
+
+build_hbase_standalone_docker_image:
+  stage: build_docker_images
+  tags:
+    - docker-build
+  script:
+    - cd hbase-standalone
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg HBASE_VERSION=$HBASE_VERSION -t registry.gitlab.com/massflows/devops/hbase/hbase-standalone:$HBASE_VERSION .
+    - docker push $CI_REGISTRY/massflows/devops/hbase/hbase-standalone:$HBASE_VERSION
+
