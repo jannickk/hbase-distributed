@@ -24,6 +24,12 @@ start_master(){
     echo
 }
 
+start_regionserver(){
+    echo "Starting HBase RegionServer..."
+    "$HBASE_HOME/bin/hbase-daemon.sh" start regionserver
+    echo
+}
+
 start_stargate(){
     # kill any pre-existing rest instances before starting new ones
     pgrep -f proc_rest && pkill -9 -f proc_rest
@@ -32,8 +38,90 @@ start_stargate(){
     echo
 }
 
+start_thrift(){
+    # kill any pre-existing thrift instances before starting new ones
+    pgrep -f proc_thrift && pkill -9 -f proc_thrift
+    echo "Starting HBase Thrift API server..."
+    "$HBASE_HOME/bin/hbase-daemon.sh" start thrift
+    #"$HBASE_HOME/bin/hbase-daemon.sh" start thrift2
+    echo
+}
+
+start_hbase_shell(){
+    echo "
+Example Usage:
+
+create 'table1', 'columnfamily1'
+
+put 'table1', 'row1', 'columnfamily1:column1', 'value1'
+
+get 'table1', 'row1'
+
+
+Now starting HBase Shell...
+"
+    "$HBASE_HOME/bin/hbase" shell
+}
+
+
+function wait_for_it()
+{
+    local serviceport=$1
+    local service=${serviceport%%:*}
+    local port=${serviceport#*:}
+    local retry_seconds=5
+    local max_try=100
+    let i=1
+
+    nc -z $service $port
+    result=$?
+
+    until [ $result -eq 0 ]; do
+      echo "[$i/$max_try] check for ${service}:${port}..."
+      echo "[$i/$max_try] ${service}:${port} is not available yet"
+      if (( $i == $max_try )); then
+        echo "[$i/$max_try] ${service}:${port} is still not available; giving up after ${max_try} tries. :/"
+        exit 1
+      fi
+
+      echo "[$i/$max_try] try in ${retry_seconds}s once again ..."
+      let "i++"
+      sleep $retry_seconds
+
+      nc -z $service $port
+      result=$?
+    done
+    echo "[$i/$max_try] $service:${port} is available."
+}
+
+trap_func(){
+    echo -e '\n\nShutting down HBase:'
+    "$HBASE_HOME/bin/hbase-daemon.sh" stop rest || :
+    "$HBASE_HOME/bin/hbase-daemon.sh" stop thrift || :
+    "$HBASE_HOME/bin/local-regionservers.sh" stop 1 || :
+    # let's not confuse users with superficial errors in the Apache HBase scripts
+    "$HBASE_HOME/bin/stop-hbase.sh" |
+        grep -v -e "ssh: command not found" \
+                -e "kill: you need to specify whom to kill" \
+                -e "kill: can't kill pid .*: No such process"
+    sleep 2
+    pgrep -fla org.apache.hadoop.hbase |
+        grep -vi org.apache.hadoop.hbase.zookeeper |
+            awk '{print $1}' |
+                xargs kill 2>/dev/null || :
+    sleep 3
+    pkill -f org.apache.hadoop.hbase.zookeeper 2>/dev/null || :
+    sleep 2
+}
+trap trap_func INT QUIT TRAP ABRT TERM EXIT SIGINT
+
+sed -i 's/zookeeper:2181/localhost:2181/' "$HBASE_HOME/conf/hbase-site.xml"
 
 start_master
 start_stargate
 
+tail -f /dev/null "$HBASE_HOME/logs/"* &
+ # this shuts down from Control-C but exits prematurely, even when +euo pipefail and doesn't shut down HBase
+ # so I rely on the sig trap handler above
 wait || :
+

@@ -4,6 +4,7 @@
   <property>
     <name>hbase.cluster.distributed</name>
     <value>false</value>
+  </property>
   <property>
     <name>hbase.hregion.majorcompaction</name>
     <value>0</value>

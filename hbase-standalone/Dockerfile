@@ -57,6 +57,6 @@ RUN /build/config-hbase.sh
 # Thrift    9090  / 9095
 # HMaster   16000 / 16010
 # RS        16201 / 16301
-EXPOSE 8080 8085 9090 9095 16000 16010 16030 16201 16301
+EXPOSE 8080
 
 ENTRYPOINT ["/entrypoint.sh"]
